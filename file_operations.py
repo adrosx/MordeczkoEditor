@@ -1,24 +1,23 @@
 from constants import SUPPORTED_EXTENSIONS
 from dialogs import dialog_critical, open_file_dialog, save_file_dialog
-from helpers import splitext
+from helpers import splitext, convert_doc_to_txt, notify_user_about_conversion
 from docx import Document
-from docx import Document  # Import do obsługi plików DOCX
+from PyQt6.QtWidgets import QMessageBox
 
 def open_file(editor):
     """
-    Obsługuje otwieranie plików w edytorze na podstawie rozszerzenia.
+    Obsługuje otwieranie plików z obsługą konwersji DOC do TXT.
     """
     path = open_file_dialog(editor)
     if not path:
         return
 
-    ext = splitext(path)[1].lower()  # Wyciągamy rozszerzenie
-    if ext not in SUPPORTED_EXTENSIONS:
-        dialog_critical(editor, "Unsupported file format!")
-        return
-
-    if ext == ".docx":
-        open_docx_file(editor, path)
+    ext = splitext(path)[1].lower()
+    if ext == ".docx" or ext == ".doc":
+        notify_user_about_conversion()
+        converted_path = convert_doc_to_txt(path)
+        if converted_path:
+            open_txt_file(editor, converted_path)
     elif ext == ".txt":
         open_txt_file(editor, path)
     else:

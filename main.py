@@ -1,3 +1,4 @@
+#main.py
 from PyQt6.QtWidgets import QApplication
 from editor_window import MegasolidEditor
 import sys

@@ -1,3 +1,4 @@
+#formatting.py
 from PyQt6.QtGui import QTextCursor, QTextCharFormat, QFont
 from PyQt6.QtGui import QTextCursor
 from PyQt6.QtCore import Qt

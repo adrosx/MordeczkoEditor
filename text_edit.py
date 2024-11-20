@@ -1,3 +1,4 @@
+#text_edit.py
 from PyQt6.QtWidgets import QTextEdit
 from PyQt6.QtGui import QTextCursor, QTextCharFormat, QFont, QColor
 
