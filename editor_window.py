@@ -4,6 +4,7 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtPrintSupport import QPrinter, QPrintDialog
 from file_operations import open_file, save_file, save_file_as
 from text_edit import TextEdit
+from constants import FONT_SIZES
 from formatting import (
     toggle_bold, toggle_italic, toggle_underline,
     change_font_size, set_default_font_size,
@@ -21,7 +22,7 @@ class MegasolidEditor(QMainWindow):
 
         # Rozmiar czcionki
         self.font_size = QComboBox()
-        self.font_size.addItems([str(s) for s in [8, 10, 12, 14, 16, 18, 20, 24]])
+        self.font_size.addItems([str(size) for size in FONT_SIZES])
         self.font_size.setFixedWidth(100)
         self.font_size.currentIndexChanged.connect(
             lambda: change_font_size(self.editor, int(self.font_size.currentText()))

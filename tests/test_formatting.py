@@ -6,6 +6,9 @@ from PyQt6.QtGui import QFont
 from formatting import toggle_bold, toggle_italic, toggle_underline, change_font_size, set_default_font_size
 from formatting import align_text_left, align_text_center, align_text_right, align_text_justify, toggle_wrap_text
 from editor_window import MegasolidEditor
+import pytest
+from editor_window import MegasolidEditor
+from constants import FONT_SIZES
 # Dodajemy folder główny projektu do PYTHONPATH
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
@@ -366,3 +369,11 @@ def test_align_justify_save(tmp_path):
     with open(test_file, "r") as f:
         content = f.read()
     assert 'align="justify"' in content or 'text-align: justify' in content
+def test_font_sizes_in_combobox(qtbot):
+    editor = MegasolidEditor()
+    qtbot.addWidget(editor)
+    
+    combobox_items = [editor.font_size.itemText(i) for i in range(editor.font_size.count())]
+    expected_items = [str(size) for size in FONT_SIZES]
+
+    assert combobox_items == expected_items, "ComboBox nie łapie pełnej listy FONT_SIZES!"
