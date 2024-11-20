@@ -28,6 +28,12 @@ class MegasolidEditor(QMainWindow):
             lambda: change_font_size(self.editor, int(self.font_size.currentText()))
         )
 
+    def update_title(self):
+        """
+        Aktualizuje tytuł okna na podstawie bieżącej ścieżki pliku.
+        """
+        self.setWindowTitle(f"MordeczkoEditor - {self.path}" if self.path else "MordeczkoEditor - Nowy plik")
+
     def reset(self):
         """
         Resetuje okno edytora do początkowego stanu.
@@ -128,12 +134,15 @@ class MegasolidEditor(QMainWindow):
             self.editor.print(printer)
 
     def file_open(self):
+        from file_operations import open_file  # Import wewnątrz metody
         open_file(self)
 
     def file_save(self):
+        from file_operations import save_file  # Import wewnątrz metody
         save_file(self)
 
     def file_save_as(self):
+        from file_operations import save_file_as  # Import wewnątrz metody
         save_file_as(self)
 
     def save_cursor_position(self):

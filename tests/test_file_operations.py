@@ -1,36 +1,75 @@
-import os
-import sys
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from editor_window import MegasolidEditor  # Import klasy MegasolidEditor
+from docx import Document  # Import do obsługi plików DOCX
+from file_operations import open_txt_file, save_txt_file, open_docx_file, save_docx_file
+from unittest.mock import patch
+from dialogs import dialog_critical
 
-from PyQt6.QtWidgets import QApplication
-from editor_window import MegasolidEditor  # Poprawiamy import, żeby korzystać z odpowiedniej klasy
-
-app = QApplication([])  # Tworzymy aplikację dla PyQt, by działały dialogi
-
-def test_file_open(tmp_path):
+def test_open_txt_file(qtbot, tmp_path):
     """
-    Testuje otwieranie pliku i sprawdza, czy tekst jest poprawnie wczytany.
+    Testuje otwieranie pliku TXT.
     """
-    test_file = tmp_path / "test.txt"
-    test_file.write_text("Hello, Mordeczko!")
+    txt_file = tmp_path / "test.txt"
+    txt_file.write_text("Hello, Mordeczko!")  # Tworzymy plik testowy
 
-    editor = MegasolidEditor()  # Tworzymy instancję naszego edytora
-    editor.path = str(test_file)  # Ustawiamy ścieżkę bez dialogu
-    with open(editor.path, "r") as f:
-        editor.editor.setPlainText(f.read())  # Wczytujemy tekst do edytora
+    editor = MegasolidEditor()  # Teraz klasa jest zaimportowana
+    qtbot.addWidget(editor)
 
-    assert editor.editor.toPlainText() == "Hello, Mordeczko!"
+    with patch.object(dialog_critical, "__call__") as mocked_dialog:
+        open_txt_file(editor, str(txt_file))
 
-def test_file_save(tmp_path):
+        # Sprawdzamy, czy tekst został wczytany
+        assert editor.editor.toPlainText() == "Hello, Mordeczko!"
+        mocked_dialog.assert_not_called()
+
+def test_save_txt_file(qtbot, tmp_path):
     """
-    Testuje zapisywanie pliku i sprawdza, czy tekst jest poprawnie zapisany.
+    Testuje zapisywanie pliku TXT.
     """
-    test_file = tmp_path / "test_save.txt"
+    editor = MegasolidEditor()
+    qtbot.addWidget(editor)
+    editor.editor.setPlainText("Save this, Mordeczko!")
 
-    editor = MegasolidEditor()  # Tworzymy instancję naszego edytora
-    editor.editor.setPlainText("Save me, Mordeczko!")
-    editor.path = str(test_file)  # Ustawiamy ścieżkę bez dialogu
-    with open(editor.path, "w") as f:
-        f.write(editor.editor.toPlainText())  # Zapisujemy tekst z edytora
+    txt_file = tmp_path / "test_save.txt"
+    save_txt_file(editor, str(txt_file))
 
-    assert test_file.read_text() == "Save me, Mordeczko!"
+    # Sprawdzamy, czy plik został zapisany
+    assert txt_file.exists()
+    assert txt_file.read_text() == "Save this, Mordeczko!"
+
+def test_open_docx_file(qtbot, tmp_path):
+    """
+    Testuje otwieranie pliku DOCX.
+    """
+    docx_file = tmp_path / "test.docx"
+    doc = Document()
+    doc.add_paragraph("Hello, Mordeczko!")
+    doc.save(str(docx_file))  # Tworzymy plik testowy DOCX
+
+    editor = MegasolidEditor()
+    qtbot.addWidget(editor)
+
+    with patch.object(dialog_critical, "__call__") as mocked_dialog:
+        open_docx_file(editor, str(docx_file))
+
+        # Sprawdzamy, czy tekst został wczytany
+        assert editor.editor.toPlainText() == "Hello, Mordeczko!"
+        mocked_dialog.assert_not_called()
+
+def test_save_docx_file(qtbot, tmp_path):
+    """
+    Testuje zapisywanie pliku DOCX.
+    """
+    editor = MegasolidEditor()
+    qtbot.addWidget(editor)
+    editor.editor.setPlainText("Save this, Mordeczko!")
+
+    docx_file = tmp_path / "test_save.docx"
+    save_docx_file(editor, str(docx_file))
+
+    # Sprawdzamy, czy plik został zapisany
+    assert docx_file.exists()
+
+    # Otwieramy plik, żeby sprawdzić treść
+    doc = Document(str(docx_file))
+    text = "\n".join([para.text for para in doc.paragraphs])
+    assert text == "Save this, Mordeczko!"
