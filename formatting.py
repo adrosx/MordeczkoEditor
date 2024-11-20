@@ -1,4 +1,7 @@
 from PyQt6.QtGui import QTextCursor, QTextCharFormat, QFont
+from PyQt6.QtGui import QTextCursor
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QTextEdit
 
 def toggle_bold(editor):
     """
@@ -61,3 +64,21 @@ def set_default_font_size(editor, size):
     fmt = editor.currentCharFormat()
     fmt.setFontPointSize(size)
     editor.setCurrentCharFormat(fmt)
+
+def align_text_left(editor):
+    editor.setAlignment(Qt.AlignmentFlag.AlignLeft)
+
+def align_text_center(editor):
+    editor.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+def align_text_right(editor):
+    editor.setAlignment(Qt.AlignmentFlag.AlignRight)
+
+def align_text_justify(editor):
+    editor.setAlignment(Qt.AlignmentFlag.AlignJustify)
+
+def toggle_wrap_text(editor):
+    if editor.lineWrapMode() == QTextEdit.LineWrapMode.NoWrap:
+        editor.setLineWrapMode(QTextEdit.LineWrapMode.WidgetWidth)
+    else:
+        editor.setLineWrapMode(QTextEdit.LineWrapMode.NoWrap)

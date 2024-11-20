@@ -1,10 +1,11 @@
 import os
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from PyQt6.QtWidgets import QApplication
-from editor_window import MegasolidEditor
 
-app = QApplication([])  # Musimy stworzyć aplikację dla PyQt
+from PyQt6.QtWidgets import QApplication
+from editor_window import MegasolidEditor  # Poprawiamy import, żeby korzystać z odpowiedniej klasy
+
+app = QApplication([])  # Tworzymy aplikację dla PyQt, by działały dialogi
 
 def test_file_open(tmp_path):
     """
@@ -13,7 +14,7 @@ def test_file_open(tmp_path):
     test_file = tmp_path / "test.txt"
     test_file.write_text("Hello, Mordeczko!")
 
-    editor = MegasolidEditor()
+    editor = MegasolidEditor()  # Tworzymy instancję naszego edytora
     editor.path = str(test_file)  # Ustawiamy ścieżkę bez dialogu
     with open(editor.path, "r") as f:
         editor.editor.setPlainText(f.read())  # Wczytujemy tekst do edytora
@@ -26,7 +27,7 @@ def test_file_save(tmp_path):
     """
     test_file = tmp_path / "test_save.txt"
 
-    editor = MegasolidEditor()
+    editor = MegasolidEditor()  # Tworzymy instancję naszego edytora
     editor.editor.setPlainText("Save me, Mordeczko!")
     editor.path = str(test_file)  # Ustawiamy ścieżkę bez dialogu
     with open(editor.path, "w") as f:

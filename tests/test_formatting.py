@@ -1,10 +1,11 @@
 import sys
 import os
+from PyQt6.QtCore import Qt  # Import dla Align
+from PyQt6.QtWidgets import QTextEdit  # Import dla LineWrapMode
 from PyQt6.QtGui import QFont
-from formatting import toggle_bold
-from editor_window import MegasolidEditor
 from formatting import toggle_bold, toggle_italic, toggle_underline, change_font_size, set_default_font_size
-
+from formatting import align_text_left, align_text_center, align_text_right, align_text_justify, toggle_wrap_text
+from editor_window import MegasolidEditor
 # Dodajemy folder główny projektu do PYTHONPATH
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
@@ -226,3 +227,142 @@ def test_cursor_restoration():
     # Sprawdzamy, czy kursor wrócił na swoje miejsce
     restored_cursor = editor.editor.textCursor()
     assert restored_cursor.position() == 6
+def test_align_text_left():
+    """
+    Testuje wyrównanie tekstu do lewej.
+    """
+    editor = MegasolidEditor()
+    editor.editor.setPlainText("Test")
+    align_text_left(editor.editor)
+    assert editor.editor.alignment() == Qt.AlignmentFlag.AlignLeft
+
+def test_align_text_center():
+    """
+    Testuje wyrównanie tekstu do środka.
+    """
+    editor = MegasolidEditor()
+    editor.editor.setPlainText("Test")
+    align_text_center(editor.editor)
+    assert editor.editor.alignment() == Qt.AlignmentFlag.AlignCenter
+
+def test_align_text_right():
+    """
+    Testuje wyrównanie tekstu do prawej.
+    """
+    editor = MegasolidEditor()
+    editor.editor.setPlainText("Test")
+    align_text_right(editor.editor)
+    assert editor.editor.alignment() == Qt.AlignmentFlag.AlignRight
+
+def test_align_text_justify():
+    """
+    Testuje wyrównanie tekstu do lewej i prawej.
+    """
+    editor = MegasolidEditor()
+    editor.editor.setPlainText("Test")
+    align_text_justify(editor.editor)
+    assert editor.editor.alignment() == Qt.AlignmentFlag.AlignJustify
+
+def test_toggle_wrap_text():
+    """
+    Testuje włączanie i wyłączanie wrapowania tekstu.
+    """
+    editor = MegasolidEditor()
+    editor.editor.setPlainText("Test")
+
+    # Ustawiamy początkowy tryb na NoWrap
+    editor.editor.setLineWrapMode(QTextEdit.LineWrapMode.NoWrap)
+    assert editor.editor.lineWrapMode() == QTextEdit.LineWrapMode.NoWrap
+
+    # Włącz wrapowanie
+    toggle_wrap_text(editor.editor)
+    assert editor.editor.lineWrapMode() == QTextEdit.LineWrapMode.WidgetWidth
+
+    # Wyłącz wrapowanie
+    toggle_wrap_text(editor.editor)
+    assert editor.editor.lineWrapMode() == QTextEdit.LineWrapMode.NoWrap
+
+def test_align_left_save(tmp_path):
+    """
+    Testuje wyrównanie do lewej i zapis pliku.
+    """
+    test_file = tmp_path / "align_left.html"
+    editor = MegasolidEditor()
+    editor.editor.setPlainText("Test")
+
+    # Ustaw wyrównanie do lewej
+    align_text_left(editor.editor)
+    assert editor.editor.alignment() == Qt.AlignmentFlag.AlignLeft
+
+    # Zapisz plik
+    with open(test_file, "w") as f:
+        f.write(editor.editor.toHtml())
+
+    # Sprawdź zapis
+    with open(test_file, "r") as f:
+        content = f.read()
+    # Sprawdzamy style Qt dla wyrównania do lewej
+    assert '-qt-block-indent:0' in content and 'text-indent:0px' in content
+
+def test_align_center_save(tmp_path):
+    """
+    Testuje wyrównanie do środka i zapis pliku.
+    """
+    test_file = tmp_path / "align_center.html"
+    editor = MegasolidEditor()
+    editor.editor.setPlainText("Test")
+    
+    # Ustaw wyrównanie do środka
+    align_text_center(editor.editor)
+    assert editor.editor.alignment() == Qt.AlignmentFlag.AlignCenter
+
+    # Zapisz plik
+    with open(test_file, "w") as f:
+        f.write(editor.editor.toHtml())
+    
+    # Sprawdź zapis
+    with open(test_file, "r") as f:
+        content = f.read()
+    assert 'align="center"' in content or 'text-align: center' in content
+
+def test_align_right_save(tmp_path):
+    """
+    Testuje wyrównanie do prawej i zapis pliku.
+    """
+    test_file = tmp_path / "align_right.html"
+    editor = MegasolidEditor()
+    editor.editor.setPlainText("Test")
+    
+    # Ustaw wyrównanie do prawej
+    align_text_right(editor.editor)
+    assert editor.editor.alignment() == Qt.AlignmentFlag.AlignRight
+
+    # Zapisz plik
+    with open(test_file, "w") as f:
+        f.write(editor.editor.toHtml())
+    
+    # Sprawdź zapis
+    with open(test_file, "r") as f:
+        content = f.read()
+    assert 'align="right"' in content or 'text-align: right' in content
+
+def test_align_justify_save(tmp_path):
+    """
+    Testuje wyrównanie do lewej i prawej (justyfikacja) i zapis pliku.
+    """
+    test_file = tmp_path / "align_justify.html"
+    editor = MegasolidEditor()
+    editor.editor.setPlainText("Test")
+    
+    # Ustaw wyrównanie do lewej i prawej
+    align_text_justify(editor.editor)
+    assert editor.editor.alignment() == Qt.AlignmentFlag.AlignJustify
+
+    # Zapisz plik
+    with open(test_file, "w") as f:
+        f.write(editor.editor.toHtml())
+    
+    # Sprawdź zapis
+    with open(test_file, "r") as f:
+        content = f.read()
+    assert 'align="justify"' in content or 'text-align: justify' in content
